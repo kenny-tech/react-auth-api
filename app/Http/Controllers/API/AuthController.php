@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
+use Auth;
 
 class AuthController extends Controller
 {
@@ -34,6 +35,22 @@ class AuthController extends Controller
             } else {
                 return $this->sendError($user = [], 'Error creating user. Please try again');
             }   
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function signin(Request $request)
+    {
+        try {
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+    
+                $data = User::whereId(Auth::user()->id)->first();
+                            
+                return $this->sendSuccess($data, 'success');
+            } else {
+                return $this->sendError($data = [], 'Incorrect Login Details');
+            }    
         } catch (\Exception $e) {
             return $e->getMessage();
         }
